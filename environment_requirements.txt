@@ -1,0 +1,3 @@
+#packages need for the environment for decisiontreesid3
+numpy
+matplotlib
