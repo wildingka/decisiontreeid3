@@ -104,10 +104,14 @@ class DecisionTree():
         for x in range(2):
             newfeatures, newtargets = self.splitvar(features, targets, node_att_col, x)
             value = self.most_common_class(newtargets)
-            self.addnewtree(root, node_attribute_name, node_att_col, value)
-            if (newfeatures.shape[1] == 0):
-                print("leaf")
+            
+            if (newfeatures.shape[0] == 0) :
+                return self
+            if ((newfeatures.shape[1] == 0) or (len(np.unique(newtargets)) == 1)) :
+                leaf_name = node_attribute_name + "leaf"
+                self.addnewtree(root, leaf_name, node_att_col, value)
             else:
+                self.addnewtree(root, node_attribute_name, node_att_col, x)
                 newroot = root.branches[x]
                 newattributes = attributes.copy()
                 newattributes.remove(node_attribute_name)
@@ -145,6 +149,8 @@ class DecisionTree():
         else:                 
             attribute_index = root.branches[0].attribute_index
             example_val = example[attribute_index]
+            if (example_val > 1):
+                example_val = 1
             newroot = root.branches[int(example_val)]
             newexample = np.delete(example, attribute_index)
             return self.findbranches(newroot, newexample)
@@ -166,9 +172,8 @@ class DecisionTree():
             example = features[row,:]
             prediction = self.findbranches(self.tree, example)
             targets[row] = int(prediction)
-        print(targets)
-        return targets
-       
+        return targets   
+        
 def entropy(positives, negatives):
     """
     The difference in entropy is the characteristic used to measure information gain. 
